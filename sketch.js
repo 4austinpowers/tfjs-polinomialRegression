@@ -2,18 +2,43 @@
 //* VARS
 let x_vals = []; // array of values - not a tensor
 let y_vals = []; // array of values - not a tensor
-let a, b, c; // tf trainable variables
+let a = []; // ax^n tf trainable variables
+let polyDegree; // degree of poly
+
 
 function setup() {
   createCanvas(400, 400);
   background(0);
 
-  // tf.variable because they change over time
-  // a b c are trainable!!!
-  a = tf.variable(tf.scalar(random(-1, 1)));
-  b = tf.variable(tf.scalar(random(-1, 1)));
-  c = tf.variable(tf.scalar(random(-1, 1)));
+
+  // add slider
+  text1 = createP('degree of polynom');
+  text1.position(width / 2 - 60, height);
+
+  slider = createSlider(0, 10, 3, 1);
+  slider.position(width / 2 - 65, height + 40);
+  polyDegree = slider.value();
+
+  text2 = createP(slider.value());
+  text2.position(width / 2, height + 50);
+  // add button
+
+  polynomCreation();
+
 }
+
+function polynomCreation() {
+  // reset array coefficient
+  a = [];
+  // tf.variable
+  // a[i] are trainable!!!
+  // create new array coefficient
+  for (let i = 0; i <= polyDegree; i++) {
+    a[i] = tf.variable(tf.scalar(random(-1, 1)));
+  }
+
+}
+
 // todo: - 1 - create a datase with mouse
 // todo: - 2 - loss function MSE
 // todo: - 3 - optimizer
@@ -44,16 +69,42 @@ const optimizer = tf.train.adam(learningRate);
 
 //* PREDICT
 function predict(x) {
+
+  //* CHANGE
   const xs = tf.tensor1d(x); // tensor xs
-  //     y = a*x^2 + b*x + c -- parabolic function
-  const ys = xs.square().mul(a).add(xs.mul(b)).add(c);
+  //     y = a[n]*x^n + ... + a[1]*x^1 + a[0]x^0 -- polynomial function
+
+  let ys = tf.tensor(0);
+
+  for (let i = 0; i <= polyDegree; i++) {
+    //cast the exponent in tensor format
+    let exponent = tf.tensor(i).toInt();
+    // add element by element
+    ys = ys.add(xs.pow(exponent).mul(a[i]));
+  }
   return ys;
+}
+
+function updatePolynomDegree() {
+
+  polyDegree = slider.value();
+  polynomCreation();
 }
 
 //* DRAW LOOP
 function draw() {
   background(0);
 
+  //update the slider
+  text2.html(slider.value());
+
+  // recreate function if degree has changed
+  if (slider.value() != polyDegree) {
+    //take new degree
+    polyDegree = slider.value();
+    // recreatefunction
+    polynomCreation();
+  }
   // draw the point from the dataset
   stroke(255);
   strokeWeight(8);
@@ -101,5 +152,6 @@ function draw() {
       vertex(x, y);
     }
     endShape();
+
   });
 }
