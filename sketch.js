@@ -16,10 +16,10 @@ function setup() {
 	m = tf.variable(tf.scalar(random(1)));
 	b = tf.variable(tf.scalar(random(1)));
 }
-//todo: create a datase with mouse
-//todo: loss function MSE
-//todo: optimizer
-//todo: predict function
+// todo: - 1 - create a datase with mouse
+// todo: - 2 - loss function MSE
+// todo: - 3 - optimizer
+// todo: - 4 - predict function
 
 //* CREATE DATASET
 function mouseClicked() {
@@ -45,6 +45,7 @@ const optimizer = tf.train.sgd(learningRate);
 function predict(x) {
 
 	const xs = tf.tensor1d(x); // tensor xs
+	//     y = m * x + b -- line function
 	const ys = xs.mul(m).add(b); // tensor ys
 
 	return ys;
@@ -55,6 +56,7 @@ function predict(x) {
 function draw() {
 	background(0);
 
+	// draw the point from the dataset
 	stroke(255);
 	strokeWeight(8);
 	for (let i = 0; i < x_vals.length; i++) {
@@ -67,8 +69,10 @@ function draw() {
 	//* TRAIN
 	tf.tidy(() => { //* tidy to clear the memory
 
-		if (x_vals.length > 0) {
+		if (x_vals.length > 0) { // don't train if there are no values
+
 			const ys = tf.tensor1d(y_vals); // tensor to cleanup
+
 			// cleanup also this tensor below
 			optimizer.minimize(() => loss(predict(x_vals), ys));
 			//* this part above is where the learning happens in tfjs
