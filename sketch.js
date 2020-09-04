@@ -8,7 +8,7 @@ let m, b; // tf trainable variables
 
 function setup() {
 
-	createCanvas(windowWidth, windowHeight);
+	createCanvas(400, 400);
 	background(0);
 
 	// tf.variable because they change over time
@@ -38,7 +38,7 @@ function loss(predictions, labels) {
 }
 
 //* OPTIMIZER
-const learningRate = 0.01;
+const learningRate = 0.03;
 const optimizer = tf.train.sgd(learningRate);
 
 //* PREDICT
