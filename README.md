@@ -1,2 +1,1 @@
-# tfjs-exp
-tensorflow js exercise
+tfjs experiment for linear regression on web
