@@ -2,7 +2,7 @@
 //* VARS
 let x_vals = []; // array of values - not a tensor
 let y_vals = []; // array of values - not a tensor
-let m, b; // tf trainable variables
+let a, b, c; // tf trainable variables
 
 
 
@@ -12,9 +12,11 @@ function setup() {
 	background(0);
 
 	// tf.variable because they change over time
-	// m & b are trainable!!!
-	m = tf.variable(tf.scalar(random(1)));
+	// a b c are trainable!!!
+	a = tf.variable(tf.scalar(random(1)));
 	b = tf.variable(tf.scalar(random(1)));
+	c = tf.variable(tf.scalar(random(1)));
+
 }
 // todo: - 1 - create a datase with mouse
 // todo: - 2 - loss function MSE
@@ -24,8 +26,8 @@ function setup() {
 //* CREATE DATASET
 function mouseClicked() {
 
-	let x = map(mouseX, 0, width, 0, 1);
-	let y = map(mouseY, 0, height, 1, 0);
+	let x = map(mouseX, 0, width, -1, 1);
+	let y = map(mouseY, 0, height, 1, -1);
 	x_vals.push(x);
 	y_vals.push(y);
 };
@@ -45,9 +47,8 @@ const optimizer = tf.train.sgd(learningRate);
 function predict(x) {
 
 	const xs = tf.tensor1d(x); // tensor xs
-	//     y = m * x + b -- line function
-	const ys = xs.mul(m).add(b); // tensor ys
-
+	//     y = a*x^2 + b*x + c -- parabolic function
+	const ys = xs.square().mul(a).add(xs.mul(b)).add(c);
 	return ys;
 }
 
@@ -61,8 +62,8 @@ function draw() {
 	strokeWeight(8);
 	for (let i = 0; i < x_vals.length; i++) {
 
-		let px = map(x_vals[i], 0, 1, 0, width);
-		let py = map(y_vals[i], 1, 0, 0, height);
+		let px = map(x_vals[i], -1, 1, 0, width);
+		let py = map(y_vals[i], 1, -1, 0, height);
 		point(px, py);
 	}
 
@@ -81,23 +82,27 @@ function draw() {
 		// draw the line on screen
 
 		// I have the xs and just need to predict the ys
-		const xs = [0, 1];
-		const ys = predict(xs); // predict creates tensors
+		const curveX = [];
 
-		// remap from predictions to screen coord
-		let x1 = map(xs[0], 0, 1, 0, width);
-		let x2 = map(xs[1], 0, 1, 0, width);
+		for (let x = -1; x = 1; x += 0.05) {
+			curveX.push(x);
+		}
+		const ys = predict(curveX); // predict creates tensors
 
 		// take the values from the tensor
-		let lineY = ys.dataSync();
+		let curveY = ys.dataSync();
 
-		// remap the ys obtained from the tensor
-		let y1 = map(lineY[0], 1, 0, 0, height);
-		let y2 = map(lineY[1], 1, 0, 0, height);
-
-		// draw the line
+		beginShape();
+		noFill();
+		stroke(255);
 		strokeWeight(2);
-		line(x1, y1, x2, y2);
+		for (let x = 0; x = curveX.length; x++) {
+			let x = map(curveX, -1, 1, 0, width);
+			let y = map(curveY, -1, 1, 0, height);
+			vertex(x, y);
+		}
+		endShape();
+
 	});
 }
 
