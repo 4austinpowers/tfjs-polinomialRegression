@@ -126,7 +126,7 @@ function changeOptimizer() {
     optimizer = tf.train.adamax(learningRate);
   } //else if (selector.value() == 'rmsprop') {
   //   optimizer = tf.train.rmsprop(learningRate);
-  // }
+  // } // RMS PROP DOESN;T WORK
 
 }
 
